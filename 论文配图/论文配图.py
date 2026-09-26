@@ -6,10 +6,10 @@
 四道题的计算脚本已经把表格、JSON 和少量图写进「结果」文件夹。
 本文件不再读取原始大文件，只根据这些已经算好的结果，补一批适合放进论文的图。
 
-原来的图全部保留，新图使用新的文件名，不会覆盖它们。
+原来的图留在「结果」文件夹。本脚本和它画出的新图都放在「论文配图」文件夹。
 
-单独出图：
-    python 论文配图.py
+单独出图（在仓库根目录执行）：
+    python 论文配图/论文配图.py
 
 四道题脚本在各自算完后，也会调用下面对应的函数。
 因此按原来的顺序重跑四道题时，这些图会一起更新。
@@ -31,12 +31,18 @@ import pandas as pd
 from matplotlib import font_manager
 from matplotlib.lines import Line2D
 
-# 脚本放在仓库根目录。结果目录和四个问题脚本用的是同一个位置。
-ROOT = Path(__file__).resolve().parent
-OUT1 = ROOT / "结果" / "问题一"
-OUT2 = ROOT / "结果" / "问题二"
-OUT3 = ROOT / "结果" / "问题三"
-OUT4 = ROOT / "结果" / "问题四"
+# 本文件放在「论文配图」文件夹。仓库根目录是它的上一级。
+# 表格仍从「结果」读取，新图画回本文件夹下的问题一至问题四。
+HERE = Path(__file__).resolve().parent
+ROOT = HERE.parent
+DATA1 = ROOT / "结果" / "问题一"
+DATA2 = ROOT / "结果" / "问题二"
+DATA3 = ROOT / "结果" / "问题三"
+DATA4 = ROOT / "结果" / "问题四"
+FIG1 = HERE / "问题一"
+FIG2 = HERE / "问题二"
+FIG3 = HERE / "问题三"
+FIG4 = HERE / "问题四"
 
 # 色盲友好的一组颜色，打印成黑白时深浅也还能分开。
 BLUE = "#0072B2"
@@ -181,13 +187,13 @@ DOMAIN_LABEL = {
 def draw_problem1():
     """问题一：熵权、抽样对照、最优配比、跨规模稳健性、质量与系数。"""
     use_paper_style()
-    weights = pd.read_csv(OUT1 / "熵权.csv", index_col=0).squeeze("columns")
-    contrast = pd.read_csv(OUT1 / "抽样与扩展对照.csv")
-    conflict = pd.read_csv(OUT1 / "冲突比例.csv", index_col=0).squeeze("columns")
-    mixture = pd.read_csv(OUT1 / "最优配比.csv")
-    checks = pd.read_csv(OUT1 / "配比模型检验.csv")
-    linked = pd.read_csv(OUT1 / "质量与系数对照.csv")
-    summary = read_json(OUT1 / "问题一输出.json")
+    weights = pd.read_csv(DATA1 / "熵权.csv", index_col=0).squeeze("columns")
+    contrast = pd.read_csv(DATA1 / "抽样与扩展对照.csv")
+    conflict = pd.read_csv(DATA1 / "冲突比例.csv", index_col=0).squeeze("columns")
+    mixture = pd.read_csv(DATA1 / "最优配比.csv")
+    checks = pd.read_csv(DATA1 / "配比模型检验.csv")
+    linked = pd.read_csv(DATA1 / "质量与系数对照.csv")
+    summary = read_json(DATA1 / "问题一输出.json")
 
     _plot_entropy(weights)
     _plot_sample_vs_extended(contrast, conflict)
@@ -225,7 +231,7 @@ def _plot_entropy(weights: pd.Series):
     ]
     ax.legend(handles=handles, loc="lower right")
     ax.set_xlim(0, table.max() * 1.18)
-    save_figure(fig, OUT1 / "熵权.png")
+    save_figure(fig, FIG1 / "熵权.png")
 
 
 def _plot_sample_vs_extended(contrast: pd.DataFrame, conflict: pd.Series):
@@ -269,7 +275,7 @@ def _plot_sample_vs_extended(contrast: pd.DataFrame, conflict: pd.Series):
         ax.text(bar.get_x() + bar.get_width() / 2, rate + 0.004, f"{rate:.1%}", ha="center", fontsize=9)
 
     fig.suptitle("问题一：质量分和冲突比例在扩展集上仍然接近", y=1.02, fontsize=13)
-    save_figure(fig, OUT1 / "抽样扩展与冲突.png")
+    save_figure(fig, FIG1 / "抽样扩展与冲突.png")
 
 
 def _plot_optimal_mixture(mixture: pd.DataFrame, q_ref: float):
@@ -288,7 +294,7 @@ def _plot_optimal_mixture(mixture: pd.DataFrame, q_ref: float):
     for i, value in enumerate(share):
         ax.text(value + 0.6, i, f"{value:.0f}%", va="center", fontsize=10)
     ax.legend(loc="lower right")
-    save_figure(fig, OUT1 / "最优配比.png")
+    save_figure(fig, FIG1 / "最优配比.png")
 
 
 def _plot_scale_robustness(checks: pd.DataFrame):
@@ -330,7 +336,7 @@ def _plot_scale_robustness(checks: pd.DataFrame):
         plt.Rectangle((0, 0), 1, 1, color=VERMILION, label="外推表"),
     ]
     ax.legend(handles=handles, loc="upper right")
-    save_figure(fig, OUT1 / "跨规模排序稳健性.png")
+    save_figure(fig, FIG1 / "跨规模排序稳健性.png")
 
 
 def _plot_quality_vs_coef(linked: pd.DataFrame, spearman: float):
@@ -351,15 +357,15 @@ def _plot_quality_vs_coef(linked: pd.DataFrame, spearman: float):
     ax.set_xlabel("领域质量分 Q")
     ax.set_ylabel("岭回归系数")
     ax.set_title(f"问题一：质量分与损失系数（Spearman = {spearman:.2f}）")
-    save_figure(fig, OUT1 / "质量与系数散点.png")
+    save_figure(fig, FIG1 / "质量与系数散点.png")
 
 
 def draw_problem2():
     """问题二：等高线、质量曲线、外部验证、质量指数、弹性替代。"""
     use_paper_style()
-    law = read_json(OUT2 / "问题二输出.json")
-    checks = pd.read_csv(OUT2 / "标度律验证.csv")
-    gamma_table = pd.read_csv(OUT2 / "质量指数估计.csv")
+    law = read_json(DATA2 / "问题二输出.json")
+    checks = pd.read_csv(DATA2 / "标度律验证.csv")
+    gamma_table = pd.read_csv(DATA2 / "质量指数估计.csv")
     _plot_loss_contour(law)
     _plot_quality_curves(law)
     _plot_external_validation(checks)
@@ -405,7 +411,7 @@ def _plot_loss_contour(law: dict):
     colorbar = fig.colorbar(contour, ax=ax, pad=0.02)
     colorbar.set_label("预测验证损失")
     ax.legend(loc="upper left")
-    save_figure(fig, OUT2 / "损失等高线.png")
+    save_figure(fig, FIG2 / "损失等高线.png")
 
 
 def _plot_quality_curves(law: dict):
@@ -434,7 +440,7 @@ def _plot_quality_curves(law: dict):
     axes[1].set_title("(b) 质量带来的损失差")
     axes[0].legend(loc="upper right", fontsize=8)
     fig.suptitle("问题二：固定 N = 6.9B 时，数据质量如何改变损失", y=1.03, fontsize=13)
-    save_figure(fig, OUT2 / "质量对损失的影响.png")
+    save_figure(fig, FIG2 / "质量对损失的影响.png")
 
 
 def _plot_external_validation(checks: pd.DataFrame):
@@ -472,7 +478,7 @@ def _plot_external_validation(checks: pd.DataFrame):
             ax.text(0.06, y, f"真实 R² = {value:.2f}，柱已截断", va="center", ha="left", fontsize=8)
         else:
             ax.text(value + 0.03, y, f"{value:.2f}", va="center", fontsize=8)
-    save_figure(fig, OUT2 / "外部验证.png")
+    save_figure(fig, FIG2 / "外部验证.png")
 
 
 def _plot_gamma(gamma_table: pd.DataFrame):
@@ -496,7 +502,7 @@ def _plot_gamma(gamma_table: pd.DataFrame):
             va="bottom",
             fontsize=8,
         )
-    save_figure(fig, OUT2 / "质量指数对照.png")
+    save_figure(fig, FIG2 / "质量指数对照.png")
 
 
 def equivalent_n_ratio(delta_q: float, law: dict) -> float:
@@ -555,7 +561,7 @@ def _plot_elasticity(law: dict):
     ax.set_ylabel("等价的参数量倍数")
     ax.set_title("(b) 保持损失不变时的参数替代")
     fig.suptitle("问题二：N = 6.9B，D = 300B，Q = Q_ref", y=1.03, fontsize=13)
-    save_figure(fig, OUT2 / "弹性与等损失替代.png")
+    save_figure(fig, FIG2 / "弹性与等损失替代.png")
 
 
 def extra_quality_cost(q_value, q0: float, kind: str):
@@ -578,9 +584,9 @@ def extra_quality_cost(q_value, q0: float, kind: str):
 def draw_problem3():
     """问题三：花费结构、规模路径、上下文临界、成本形状、损失下降。"""
     use_paper_style()
-    result = pd.read_csv(OUT3 / "三档预算最优配置.csv")
-    sens = pd.read_csv(OUT3 / "上下文敏感性.csv")
-    summary = read_json(OUT3 / "问题三输出.json")
+    result = pd.read_csv(DATA3 / "三档预算最优配置.csv")
+    sens = pd.read_csv(DATA3 / "上下文敏感性.csv")
+    summary = read_json(DATA3 / "问题三输出.json")
     _plot_spend_structure(result)
     _plot_scale_path(result)
     _plot_context_threshold(sens, summary["L_ctx_crit"])
@@ -632,7 +638,7 @@ def _plot_spend_structure(result: pd.DataFrame):
     fig.subplots_adjust(bottom=0.30, top=0.82, wspace=0.18)
     fig.legend(handles=handles, loc="lower center", ncol=3, bbox_to_anchor=(0.5, 0.02), fontsize=8)
     fig.suptitle("问题三：三档预算下的算力花费结构（上下文 8192）", y=0.96, fontsize=13)
-    save_figure(fig, OUT3 / "花费结构.png")
+    save_figure(fig, FIG3 / "花费结构.png")
 
 
 def _plot_scale_path(result: pd.DataFrame):
@@ -655,7 +661,7 @@ def _plot_scale_path(result: pd.DataFrame):
         ax.set_title(title)
     axes[0].legend(loc="upper left")
     fig.suptitle("问题三：最优规模随预算上升", y=1.03, fontsize=13)
-    save_figure(fig, OUT3 / "最优规模随预算.png")
+    save_figure(fig, FIG3 / "最优规模随预算.png")
 
 
 def _plot_context_threshold(sens: pd.DataFrame, lctx_crit: float):
@@ -681,7 +687,7 @@ def _plot_context_threshold(sens: pd.DataFrame, lctx_crit: float):
     lines1, labels1 = ax1.get_legend_handles_labels()
     lines2, labels2 = ax2.get_legend_handles_labels()
     ax1.legend(lines1 + lines2, labels1 + labels2, loc="center left")
-    save_figure(fig, OUT3 / "上下文临界长度.png")
+    save_figure(fig, FIG3 / "上下文临界长度.png")
 
 
 def _plot_cost_shapes(q0: float):
@@ -698,7 +704,7 @@ def _plot_cost_shapes(q0: float):
     ax.set_ylabel("每个 token 的额外质量成本（FLOPs）")
     ax.set_title(f"问题三：三种质量成本的形状（基线 Q0 = {q0:.3f}）")
     ax.legend(loc="upper left")
-    save_figure(fig, OUT3 / "质量成本形状.png")
+    save_figure(fig, FIG3 / "质量成本形状.png")
 
 
 def _plot_loss_vs_budget(result: pd.DataFrame):
@@ -727,20 +733,20 @@ def _plot_loss_vs_budget(result: pd.DataFrame):
     ax.set_ylabel("最优预测验证损失")
     ax.set_title("问题三：预算提高后，最优损失随之下移")
     ax.legend(loc="upper right")
-    save_figure(fig, OUT3 / "最优损失随预算.png")
+    save_figure(fig, FIG3 / "最优损失随预算.png")
 
 
 def draw_problem4():
     """问题四：贡献分解、宏观规模、损失映射、BBH 分布、前沿情景。"""
     use_paper_style()
-    decom = pd.read_csv(OUT4 / "规模与技术进步分解.csv")
-    macro = pd.read_csv(OUT4 / "开源模型宏观规模.csv")
-    mapping = pd.read_csv(OUT4 / "损失到榜单映射.csv")
-    frontier = pd.read_csv(OUT4 / "年度前沿.csv")
-    forecast = pd.read_csv(OUT4 / "前沿预测.csv")
-    detail = pd.read_csv(OUT4 / "BBH子任务聚合.csv")
-    summary = pd.read_csv(OUT4 / "BBH子任务汇总.csv").iloc[0]
-    law_path = OUT2 / "问题二输出.json"
+    decom = pd.read_csv(DATA4 / "规模与技术进步分解.csv")
+    macro = pd.read_csv(DATA4 / "开源模型宏观规模.csv")
+    mapping = pd.read_csv(DATA4 / "损失到榜单映射.csv")
+    frontier = pd.read_csv(DATA4 / "年度前沿.csv")
+    forecast = pd.read_csv(DATA4 / "前沿预测.csv")
+    detail = pd.read_csv(DATA4 / "BBH子任务聚合.csv")
+    summary = pd.read_csv(DATA4 / "BBH子任务汇总.csv").iloc[0]
+    law_path = DATA2 / "问题二输出.json"
     loss_value = None
     if law_path.exists():
         loss_value = float(read_json(law_path)["elasticity"]["L"])
@@ -785,7 +791,7 @@ def _plot_contribution(decom: pd.DataFrame):
         color=INK,
     )
     ax.legend(loc="upper right")
-    save_figure(fig, OUT4 / "规模与技术贡献.png")
+    save_figure(fig, FIG4 / "规模与技术贡献.png")
 
 
 def _plot_macro_scale(macro: pd.DataFrame):
@@ -807,7 +813,7 @@ def _plot_macro_scale(macro: pd.DataFrame):
         ax.set_title(title)
         ax.set_xticks([2016, 2019, 2022, 2025])
     fig.suptitle("问题四：开放权重模型的宏观规模（年度中位数）", y=1.05, fontsize=13)
-    save_figure(fig, OUT4 / "开源宏观规模.png")
+    save_figure(fig, FIG4 / "开源宏观规模.png")
 
 
 def _plot_loss_mapping(mapping: pd.DataFrame, loss_value):
@@ -831,7 +837,7 @@ def _plot_loss_mapping(mapping: pd.DataFrame, loss_value):
     ax.set_ylabel("榜单综合均分")
     ax.set_title("问题四：损失到榜单分数必须分层映射")
     ax.legend(loc="upper right")
-    save_figure(fig, OUT4 / "损失到分数映射.png")
+    save_figure(fig, FIG4 / "损失到分数映射.png")
 
 
 def _plot_bbh(detail: pd.DataFrame, summary: pd.Series):
@@ -858,7 +864,7 @@ def _plot_bbh(detail: pd.DataFrame, summary: pd.Series):
     ax.set_title("(b) 总分相近时，内部波动仍然大")
     ax.legend(loc="upper right", fontsize=8)
     fig.suptitle(f"问题四：{int(summary['n_models'])} 个模型的 BBH 逐任务表现", y=1.03, fontsize=13)
-    save_figure(fig, OUT4 / "BBH均值与离散.png")
+    save_figure(fig, FIG4 / "BBH均值与离散.png")
 
 
 def _plot_forecast(frontier: pd.DataFrame, forecast: pd.DataFrame):
@@ -893,7 +899,7 @@ def _plot_forecast(frontier: pd.DataFrame, forecast: pd.DataFrame):
         fontsize=8,
         color=GRAY,
     )
-    save_figure(fig, OUT4 / "前沿情景对比.png")
+    save_figure(fig, FIG4 / "前沿情景对比.png")
 
 
 def main():
@@ -903,7 +909,7 @@ def main():
     draw_problem2()
     draw_problem3()
     draw_problem4()
-    print("全部补充图已写入 结果/问题一 至 结果/问题四。")
+    print("全部补充图已写入 论文配图/问题一 至 论文配图/问题四。")
 
 
 if __name__ == "__main__":

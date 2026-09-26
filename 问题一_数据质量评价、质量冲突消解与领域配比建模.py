@@ -550,7 +550,9 @@ def main():
     print("2. 冲突按“内容价值与文本卫生显著背离”定义，并用短板加权消解。")
     print("3. 配比-损失模型在 1M/60M/1B 检验集上给出 RMSE 与 R^2；10B/70B 只作排序稳健性讨论。")
     print(f"结果目录：{OUT}")
-    # 计算表已经写完。这里再补论文图；图的画法集中在「论文配图.py」。
+    # 绘图脚本放在「论文配图」文件夹。先把该文件夹加入搜索路径，才能导入。
+    import sys
+    sys.path.insert(0, str(Path(__file__).resolve().parent / "论文配图"))
     from 论文配图 import draw_problem1
     draw_problem1()
 

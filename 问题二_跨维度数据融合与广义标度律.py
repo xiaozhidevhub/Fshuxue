@@ -317,7 +317,9 @@ def main():
     plt.close(fig)
 
     print(f"\n结果目录：{OUT}")
-    # 计算表已经写完。这里再补论文图；图的画法集中在「论文配图.py」。
+    # 绘图脚本放在「论文配图」文件夹。先把该文件夹加入搜索路径，才能导入。
+    import sys
+    sys.path.insert(0, str(Path(__file__).resolve().parent / "论文配图"))
     from 论文配图 import draw_problem2
     draw_problem2()
 
