@@ -34,7 +34,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-plt.rcParams["font.sans-serif"] = ["Microsoft YaHei", "SimHei", "DejaVu Sans"]
+plt.rcParams["font.sans-serif"] = ["WenQuanYi Micro Hei", "Microsoft YaHei", "SimHei", "DejaVu Sans"]
 plt.rcParams["axes.unicode_minus"] = False
 
 ROOT = Path(__file__).resolve().parent
@@ -246,6 +246,9 @@ def main():
     }
     (OUT / "问题三输出.json").write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
     print(f"\n结果目录：{OUT}")
+    # 计算表已经写完。这里再补论文图；图的画法集中在「论文配图.py」。
+    from 论文配图 import draw_problem3
+    draw_problem3()
 
 
 if __name__ == "__main__":

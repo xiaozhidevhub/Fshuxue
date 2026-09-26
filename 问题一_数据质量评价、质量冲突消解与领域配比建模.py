@@ -27,7 +27,7 @@ from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.model_selection import KFold
 
 # 让图中的中文能正常显示（Windows 常见字体）
-plt.rcParams["font.sans-serif"] = ["Microsoft YaHei", "SimHei", "DejaVu Sans"]
+plt.rcParams["font.sans-serif"] = ["WenQuanYi Micro Hei", "Microsoft YaHei", "SimHei", "DejaVu Sans"]
 plt.rcParams["axes.unicode_minus"] = False
 
 # 路径：脚本放在 F 题目录，数据在 real_attachments 下
@@ -550,6 +550,9 @@ def main():
     print("2. 冲突按“内容价值与文本卫生显著背离”定义，并用短板加权消解。")
     print("3. 配比-损失模型在 1M/60M/1B 检验集上给出 RMSE 与 R^2；10B/70B 只作排序稳健性讨论。")
     print(f"结果目录：{OUT}")
+    # 计算表已经写完。这里再补论文图；图的画法集中在「论文配图.py」。
+    from 论文配图 import draw_problem1
+    draw_problem1()
 
 
 if __name__ == "__main__":
