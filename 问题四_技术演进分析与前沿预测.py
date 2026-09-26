@@ -32,7 +32,7 @@ import numpy as np
 import pandas as pd
 from sklearn.linear_model import LinearRegression
 
-plt.rcParams["font.sans-serif"] = ["Microsoft YaHei", "SimHei", "DejaVu Sans"]
+plt.rcParams["font.sans-serif"] = ["WenQuanYi Micro Hei", "Microsoft YaHei", "SimHei", "DejaVu Sans"]
 plt.rcParams["axes.unicode_minus"] = False
 
 ROOT = Path(__file__).resolve().parent
@@ -382,6 +382,11 @@ def main():
     plt.close(fig)
 
     print(f"\n结果目录：{OUT}")
+    # 绘图脚本放在「论文配图」文件夹。先把该文件夹加入搜索路径，才能导入。
+    import sys
+    sys.path.insert(0, str(Path(__file__).resolve().parent / "论文配图"))
+    from 论文配图 import draw_problem4
+    draw_problem4()
 
 
 if __name__ == "__main__":
